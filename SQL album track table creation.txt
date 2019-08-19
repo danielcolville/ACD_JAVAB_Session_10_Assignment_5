@@ -1,0 +1,34 @@
+CREATE TABLE `empdb1`.`artist` (
+  `idArtist` INT NOT NULL,
+  `Band_Name` VARCHAR(45) NOT NULL,
+  `Nationality` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idArtist`));
+
+
+
+CREATE TABLE `empdb1`.`album` (
+  `idAlbum` INT NOT NULL,
+  `Album_Name` VARCHAR(45) NOT NULL,
+  `art_id` INT NOT NULL,
+  `year` INT NOT NULL,
+  `rating` DECIMAL NOT NULL,
+  `num_track` INT NOT NULL,
+  `album_type` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idAlbum`));
+
+
+CREATE TABLE `empdb1`.`track` (
+  `track_id` INT NOT NULL,
+  `album_id` INT NULL,
+  `track_name` VARCHAR(45) NULL,
+  `length` INT NULL,
+  `top_chart` INT NULL,
+  `rating` DECIMAL NULL,
+  `track_num` INT NULL,
+  PRIMARY KEY (`track_id`),
+  INDEX `alb_id_for_idx` (`album_id` ASC) VISIBLE,
+  CONSTRAINT `alb_id_for`
+    FOREIGN KEY (`album_id`)
+    REFERENCES `empdb1`.`album` (`idAlbum`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);

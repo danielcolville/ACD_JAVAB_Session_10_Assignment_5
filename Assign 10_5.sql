@@ -83,11 +83,8 @@ a2.album_type='studio' and a2.album_artist_id=ar.artist_id
  and al2.album_year<al.album_year
  );
  -- 12
- select count(album_rating) from albums group by(album_artist_id);
  
- -- select j1.artist_name, cast( (lt3/tot * 100) as numeric(5,2) ) as P
- -- from  (
- select count1.artist_name from artists ar1, 	
+ 	
  select *, truncate ( (lt3/tot*100),2) as P  from
  (
 	select ar1.artist_name,ar1.artist_id, count(*) as lt3
@@ -102,3 +99,56 @@ a2.album_type='studio' and a2.album_artist_id=ar.artist_id
      )  as t2  
      on t1.artist_id=t2.artist_id  
      order by P;
+
+-- 13
+select f1.artist_id
+from (
+select distinct artist_id,artist_name,nationality
+from albums al1, artists ar1
+where ar1.artist_id=al1.album_artist_id and al1.album_type='studio'
+)
+as f1
+where 
+(
+ (f1.artist_id<>ar2
+ .album_artist_id and f1.nationality=ar2.nationality) or 
+ f1.nationality in (
+	select nationality
+    from artists ar2 join albums al2 on ar2.artist_id=al2.album_artist_id
+    where  al2.album_type='studio'
+    group by ar2.nationality
+    having count(distinct ar2.artist_id)=1
+    ) 
+);
+
+-- 13
+select ar1.artist_name,count(distinct album_id)
+from albums al1,artists ar1
+where al1.album_artist_id=ar1.artist_id and al1.album_type='studio' 
+group by ar1.artist_id
+having count(distinct album_id)  >= all (
+select count(distinct album_id) 
+from albums al2,artists ar2
+where ar1.nationality=ar2.nationality and al2.album_type='studio'
+group by ar2.artist_id
+)
+;
+
+
+-- 14
+select al1.album_title as Higher ,al1.album_rating, al2.album_title as Lower,al2.album_rating
+from albums al1 join artists ar1 on ar1.artist_id=al1.album_artist_id,
+albums al2 join artists ar2 on ar2.artist_id=al2.album_artist_id
+where ar2.artist_name!=ar1.artist_name and al1.album_year=al2.album_year and al1.album_rating >al2.album_rating;
+
+
+-- 15
+select count(al1.album_rating)/trc as ratio, al1.album_title
+from (albums al1 join 
+( select t1.track_album_id, count(t1.track_number) as trc
+from tracks t1
+group by t1.track_album_id
+)
+as tc on tc.track_album_id=al1.album_id
+)
+order by ratio DESC

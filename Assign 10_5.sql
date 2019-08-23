@@ -1,3 +1,4 @@
+
 use newschema;
 -- 1
 select * from ( select * from albums join artists on albums.album_artist_id=artists.artist_id ) b1,
@@ -24,14 +25,12 @@ where a1.artist_type='band' and al1.album_rating >
  select al1.album_title,ar1.artist_name,t1.track_name from albums al1,artists ar1,tracks t1 where album_year>='1999' and
  t1.track_album_id=al1.album_id and al1.album_artist_id=ar1.artist_id and t1.track_length<154 and al1.album_rating >= 4;
  
- select * from tracks tr,albums al where al.album_id=tr.track_album_id;
  
  -- 6
  select sum(tr.track_length),track_album_id from albums al,tracks tr
  where al.album_year and al.album_year between 1990 and 1999 and al.album_id=tr.track_album_id group by tr.track_album_id;
 
 -- 7
-select * from albums;
 
 select * from artists ar
 where ar.artist_id not in
@@ -70,8 +69,6 @@ a2.album_type='studio' and a2.album_artist_id=ar.artist_id
  count(al.album_type='compilation'>=1) and min(al.album_rating)>=3;
  
  -- 11
- select * from artists ar, albums al
- where ar.artist_id=al.album_artist_id;
  
  select count(artist_name) from artists ar,albums al
  where ar.artist_id=al.album_artist_id and al.album_rating='5' 
@@ -100,26 +97,6 @@ a2.album_type='studio' and a2.album_artist_id=ar.artist_id
      on t1.artist_id=t2.artist_id  
      order by P;
 
--- 13
-select f1.artist_id
-from (
-select distinct artist_id,artist_name,nationality
-from albums al1, artists ar1
-where ar1.artist_id=al1.album_artist_id and al1.album_type='studio'
-)
-as f1
-where 
-(
- (f1.artist_id<>ar2
- .album_artist_id and f1.nationality=ar2.nationality) or 
- f1.nationality in (
-	select nationality
-    from artists ar2 join albums al2 on ar2.artist_id=al2.album_artist_id
-    where  al2.album_type='studio'
-    group by ar2.nationality
-    having count(distinct ar2.artist_id)=1
-    ) 
-);
 
 -- 13
 select ar1.artist_name,count(distinct album_id)
@@ -128,8 +105,8 @@ where al1.album_artist_id=ar1.artist_id and al1.album_type='studio'
 group by ar1.artist_id
 having count(distinct album_id)  >= all (
 select count(distinct album_id) 
-from albums al2,artists ar2
-where ar1.nationality=ar2.nationality and al2.album_type='studio'
+from albums al2,artists ar2,artists ar1
+where ar1.nationality=ar2.nationality and al2.album_type='studio' AND al2.album_artist_id=ar2.artist_id
 group by ar2.artist_id
 )
 ;

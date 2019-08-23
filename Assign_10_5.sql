@@ -1,5 +1,9 @@
+-- *** SqlDbx Personal Edition ***
+-- !!! Not licensed for commercial use beyound 90 days evaluation period !!!
+-- For version limitations please check http://www.sqldbx.com/personal_edition.htm
+-- Number of queries executed: 50, number of rows retrieved: 357
 
-use newschema;
+USE newschema;
 -- 1
 select * from ( select * from albums join artists on albums.album_artist_id=artists.artist_id ) b1,
 ( select * from albums join artists on albums.album_artist_id=artists.artist_id ) b2
@@ -63,10 +67,32 @@ a2.album_type='studio' and a2.album_artist_id=ar.artist_id
  
  -- 10
  
- select ar.artist_name,al.album_title,al.album_rating,al.album_type from artists ar, albums al
- where al.album_artist_id=ar.artist_id
- having count(al.album_type='studio'>=3) and count(al.album_type='live'>=2) and
- count(al.album_type='compilation'>=1) and min(al.album_rating)>=3;
+ 
+ SELECT * FROM 
+ (
+ (SELECT *,count(al.album_id) FROM albums al JOIN artists ar ON ar.artist_id = al.album_artist_id 
+ WHERE al.album_type='studio'
+ GROUP BY al.album_artist_id
+ HAVING count(album_id) >=3 
+ ) c1
+ JOIN
+ (
+ SELECT *,count(al2.album_id) FROM albums al2 JOIN artists ar2 ON ar2.artist_id = al2.album_artist_id 
+ WHERE al2.album_type='live'
+ GROUP BY al2.album_artist_id
+ HAVING count(al2.album_id)>=2
+ ) c2 ON c1.artist_id=c2.artist_id
+JOIN 
+ (
+ SELECT *,count(al3.album_id) FROM albums al3 JOIN artists ar3 ON ar3.artist_id = al3.album_artist_id 
+ WHERE al3.album_type='compilation'
+ GROUP BY al3.album_artist_id 
+ HAVING count(al3.album_id) >=1 )
+  c3 ON c2.artist_id=c3.artist_id 
+ ) having min(c1.album_rating)>=3 AND min(c2.album_rating)>=3 AND min(c3.album_rating) >=3;
+ 
+
+ 
  
  -- 11
  

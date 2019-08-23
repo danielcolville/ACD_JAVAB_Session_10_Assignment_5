@@ -1,6 +1,0 @@
-"idsalesman";"name";"addresses";"city";"pin_code";"state";"salary";"delivery_date";"total_qty"
-1;"Jane Doe";"addr1";"New YOrk";11111;"NY";1000.0;"2019-01-01";10
-2;"JOhn Smith";"addr2";"Philadelphia";12345;"PA";500.0;"2019-01-01";5
-3;"Willy Loman";"Address";"New York";55555;"NY";1.0;"1955-01-25";1000
-4;"Dwight";"Addr3";"Scranton";18015;"PA";1234.0;"1999-01-01";4000
-5;"Bob";"Addr4";"Megacity";99999;"CA";1500.0;"1876-01-01";500

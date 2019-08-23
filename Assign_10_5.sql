@@ -1,7 +1,3 @@
--- *** SqlDbx Personal Edition ***
--- !!! Not licensed for commercial use beyound 90 days evaluation period !!!
--- For version limitations please check http://www.sqldbx.com/personal_edition.htm
--- Number of queries executed: 50, number of rows retrieved: 357
 
 USE newschema;
 -- 1
@@ -106,7 +102,6 @@ JOIN
  and al2.album_year<al.album_year
  );
  -- 12
- 
  	
  select *, truncate ( (lt3/tot*100),2) as P  from
  (
@@ -125,17 +120,27 @@ JOIN
 
 
 -- 13
-select ar1.artist_name,count(distinct album_id)
+
+
+
+SELECT DISTINCT a1.artist_name,c1 FROM(
+(
+select ar1.artist_name,ar1.nationality,count(distinct album_id) AS c1
 from albums al1,artists ar1
 where al1.album_artist_id=ar1.artist_id and al1.album_type='studio' 
 group by ar1.artist_id
-having count(distinct album_id)  >= all (
-select count(distinct album_id) 
-from albums al2,artists ar2,artists ar1
-where ar1.nationality=ar2.nationality and al2.album_type='studio' AND al2.album_artist_id=ar2.artist_id
+)a1
+join
+(
+select ar2.artist_name,ar2.nationality,count(distinct al2.album_id) AS c2
+from albums al2,artists ar2
+where  al2.album_type='studio' AND al2.album_artist_id=ar2.artist_id
 group by ar2.artist_id
+)a2
 )
-;
+WHERE a1.nationality=a2.nationality AND c1>c2 OR a1.nationality<>a2.nationality;
+
+
 
 
 -- 14
@@ -146,12 +151,6 @@ where ar2.artist_name!=ar1.artist_name and al1.album_year=al2.album_year and al1
 
 
 -- 15
-select count(al1.album_rating)/trc as ratio, al1.album_title
-from (albums al1 join 
-( select t1.track_album_id, count(t1.track_number) as trc
-from tracks t1
-group by t1.track_album_id
-)
-as tc on tc.track_album_id=al1.album_id
-)
-order by ratio DESC
+
+SELECT al.album_title,al.album_rating/count(tc.track_number) AS ratio FROM  tracks tc,albums al WHERE tc.track_album_id=al.album_id 
+GROUP BY tc.track_album_id ORDER BY ratio DESC;
